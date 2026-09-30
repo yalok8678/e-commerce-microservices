@@ -78,7 +78,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/ecommerce-authentication-service:latest
       # ==========================================
-      # Build Vendor Service
+      # Build Vendor Services
       # ==========================================
 
       - name: Build Vendor Service
