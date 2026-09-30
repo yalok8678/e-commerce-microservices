@@ -29,9 +29,9 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Build Authentication Service
+      - name: Test Authentication Service
         working-directory: authentication-service
-        run: ./mvnw clean package -DskipTests
+        run: ./mvnw clean test
 
       - name: Build Vendor Service
         working-directory: vendor-service
