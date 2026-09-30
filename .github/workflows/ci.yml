@@ -18,28 +18,26 @@ jobs:
     services:
       postgres:
         image: postgres:17
+
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: ecommerce_auth
+
         ports:
           - 5432:5432
+
         options: >-
-          --health-cmd="pg_isready -U postgres"
+          --health-cmd="pg_isready -U postgres -d ecommerce_auth"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=5
+          --health-retries=10
 
     steps:
-      # -----------------------------
-      # Checkout
-      # -----------------------------
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # -----------------------------
-      # Java 21
-      # -----------------------------
       - name: Setup Java 21
         uses: actions/setup-java@v4
         with:
@@ -47,83 +45,100 @@ jobs:
           java-version: '21'
           cache: maven
 
-      # -----------------------------
+      # ==========================================
+      # Verify PostgreSQL
+      # ==========================================
+
+      - name: Verify PostgreSQL
+        run: |
+          pg_isready -h localhost -p 5432 -U postgres
+
+      # ==========================================
       # Authentication Service Tests
-      # -----------------------------
+      # ==========================================
+
       - name: Test Authentication Service
         working-directory: authentication-service
         env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/ecommerce_auth
-          SPRING_DATASOURCE_USERNAME: postgres
-          SPRING_DATASOURCE_PASSWORD: postgres
+          SPRING_PROFILES_ACTIVE: test
         run: ./mvnw clean test
 
-      # -----------------------------
+      # ==========================================
       # Build Vendor Service
-      # -----------------------------
+      # ==========================================
+
       - name: Build Vendor Service
         working-directory: vendor-service
         run: ./mvnw clean package -DskipTests
 
-      # -----------------------------
+      # ==========================================
       # Build Product Service
-      # -----------------------------
+      # ==========================================
+
       - name: Build Product Service
         working-directory: product-service
         run: ./mvnw clean package -DskipTests
 
-      # -----------------------------
+      # ==========================================
       # Build Inventory Service
-      # -----------------------------
+      # ==========================================
+
       - name: Build Inventory Service
         working-directory: inventory-service
         run: ./mvnw clean package -DskipTests
 
-      # -----------------------------
+      # ==========================================
       # Build Cart Service
-      # -----------------------------
+      # ==========================================
+
       - name: Build Cart Service
         working-directory: cart-service
         run: ./mvnw clean package -DskipTests
 
-      # -----------------------------
+      # ==========================================
       # Build Order Service
-      # -----------------------------
+      # ==========================================
+
       - name: Build Order Service
         working-directory: order-service
         run: ./mvnw clean package -DskipTests
 
-      # -----------------------------
+      # ==========================================
       # Build Payment Service
-      # -----------------------------
+      # ==========================================
+
       - name: Build Payment Service
         working-directory: payment-service
         run: ./mvnw clean package -DskipTests
 
-      # -----------------------------
+      # ==========================================
       # Build Notification Service
-      # -----------------------------
+      # ==========================================
+
       - name: Build Notification Service
         working-directory: notification-service
         run: ./mvnw clean package -DskipTests
 
-      # -----------------------------
+      # ==========================================
       # Build API Gateway
-      # -----------------------------
+      # ==========================================
+
       - name: Build API Gateway
         working-directory: api-gateway
         run: ./mvnw clean package -DskipTests
 
-      # -----------------------------
+      # ==========================================
       # Build Config Server
-      # -----------------------------
+      # ==========================================
+
       - name: Build Config Server
         working-directory: config-server
         run: ./mvnw clean package -DskipTests
 
-      # -----------------------------
+      # ==========================================
       # Build Service Discovery
-      # -----------------------------
+      # ==========================================
+
       - name: Build Service Discovery
         working-directory: service-discovery
         run: ./mvnw clean package -DskipTests
