@@ -42,6 +42,10 @@ jobs:
 
       - name: Test Authentication Service
         working-directory: authentication-service
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/ecommerce_auth
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres
         run: ./mvnw clean test
 
       - name: Build Vendor Service
