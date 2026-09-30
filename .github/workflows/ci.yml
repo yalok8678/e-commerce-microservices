@@ -61,8 +61,15 @@ jobs:
           pg_isready -h localhost -p 5432 -U postgres
 
       # ==========================================
-      # Authentication Service Tests
+        # ==========================================
+      # Authentication Service
       # ==========================================
+
+      - name: Build Authentication Service
+        working-directory: authentication-service
+        env:
+          SPRING_PROFILES_ACTIVE: test
+        run: ./mvnw clean package
 
       - name: Build and Push Authentication Service
         uses: docker/build-push-action@v6
@@ -70,7 +77,6 @@ jobs:
           context: ./authentication-service
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/ecommerce-authentication-service:latest
-
       # ==========================================
       # Build Vendor Service
       # ==========================================
