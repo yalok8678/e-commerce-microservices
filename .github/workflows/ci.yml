@@ -64,7 +64,7 @@ jobs:
         working-directory: authentication-service
         env:
           SPRING_PROFILES_ACTIVE: test
-        run: ./mvnw clean test
+        run: ./mvnw clean package
 
       # ==========================================
       # Build Vendor Service
