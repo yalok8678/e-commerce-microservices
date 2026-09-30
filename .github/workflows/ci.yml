@@ -45,6 +45,9 @@ jobs:
           java-version: '21'
           cache: maven
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       # ==========================================
       # Verify PostgreSQL
       # ==========================================
@@ -142,3 +145,40 @@ jobs:
       - name: Build Service Discovery
         working-directory: service-discovery
         run: ./mvnw clean package -DskipTests
+
+      # ==========================================
+      # Build Docker Images
+      # ==========================================
+
+      - name: Build Authentication Service Image
+        run: docker build -t ecommerce-authentication-service:ci ./authentication-service
+
+      - name: Build Vendor Service Image
+        run: docker build -t ecommerce-vendor-service:ci ./vendor-service
+
+      - name: Build Product Service Image
+        run: docker build -t ecommerce-product-service:ci ./product-service
+
+      - name: Build Inventory Service Image
+        run: docker build -t ecommerce-inventory-service:ci ./inventory-service
+
+      - name: Build Cart Service Image
+        run: docker build -t ecommerce-cart-service:ci ./cart-service
+
+      - name: Build Order Service Image
+        run: docker build -t ecommerce-order-service:ci ./order-service
+
+      - name: Build Payment Service Image
+        run: docker build -t ecommerce-payment-service:ci ./payment-service
+
+      - name: Build Notification Service Image
+        run: docker build -t ecommerce-notification-service:ci ./notification-service
+
+      - name: Build API Gateway Image
+        run: docker build -t ecommerce-api-gateway:ci ./api-gateway
+
+      - name: Build Config Server Image
+        run: docker build -t ecommerce-config-server:ci ./config-server
+
+      - name: Build Service Discovery Image
+        run: docker build -t ecommerce-service-discovery:ci ./service-discovery
