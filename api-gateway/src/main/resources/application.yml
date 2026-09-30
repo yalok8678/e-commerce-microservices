@@ -1,0 +1,347 @@
+spring:
+  application:
+    name: api-gateway
+
+  data:
+    redis:
+      host: redis
+      port: 6379
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+
+            # =========================
+            # AUTHENTICATION SERVICE
+            # =========================
+            - id: authentication-service
+              uri: http://authentication-service:8081
+              predicates:
+                - Path=/api/auth/**
+              filters:
+                - name: Retry
+                  args:
+                    retries: 2
+                    statuses: BAD_GATEWAY,GATEWAY_TIMEOUT,SERVICE_UNAVAILABLE
+                    methods: GET,POST
+
+            # =========================
+            # VENDOR SERVICE
+            # =========================
+            - id: vendor-service
+              uri: http://vendor-service:8082
+              predicates:
+                - Path=/api/vendors/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: vendorCircuitBreaker
+                    fallbackUri: forward:/fallback/vendor
+
+                - name: Retry
+                  args:
+                    retries: 2
+                    statuses: BAD_GATEWAY,GATEWAY_TIMEOUT,SERVICE_UNAVAILABLE
+                    methods: GET,POST,PUT,DELETE
+
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@userKeyResolver}"
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
+                    redis-rate-limiter.requestedTokens: 1
+
+            # =========================
+            # PRODUCT SERVICE
+            # =========================
+            - id: product-service
+              uri: http://product-service:8083
+              predicates:
+                - Path=/api/products/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: productCircuitBreaker
+                    fallbackUri: forward:/fallback/product
+
+                - name: Retry
+                  args:
+                    retries: 2
+                    statuses: BAD_GATEWAY,GATEWAY_TIMEOUT,SERVICE_UNAVAILABLE
+                    methods: GET,POST,PUT,DELETE
+
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@userKeyResolver}"
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
+                    redis-rate-limiter.requestedTokens: 1
+
+            # =========================
+            # INVENTORY SERVICE
+            # =========================
+            - id: inventory-service
+              uri: http://inventory-service:8084
+              predicates:
+                - Path=/api/inventory/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: inventoryCircuitBreaker
+                    fallbackUri: forward:/fallback/inventory
+
+                - name: Retry
+                  args:
+                    retries: 2
+                    statuses: BAD_GATEWAY,GATEWAY_TIMEOUT,SERVICE_UNAVAILABLE
+                    methods: GET,POST,PUT,DELETE
+
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@userKeyResolver}"
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
+                    redis-rate-limiter.requestedTokens: 1
+
+            # =========================
+            # CART SERVICE
+            # =========================
+            - id: cart-service
+              uri: http://cart-service:8085
+              predicates:
+                - Path=/api/cart/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: cartCircuitBreaker
+                    fallbackUri: forward:/fallback/cart
+
+                - name: Retry
+                  args:
+                    retries: 2
+                    statuses: BAD_GATEWAY,GATEWAY_TIMEOUT,SERVICE_UNAVAILABLE
+                    methods: GET,POST,PUT,DELETE
+
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@userKeyResolver}"
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
+                    redis-rate-limiter.requestedTokens: 1
+
+            # =========================
+            # ORDER SERVICE
+            # =========================
+            - id: order-service
+              uri: http://order-service:8086
+              predicates:
+                - Path=/api/orders/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: orderCircuitBreaker
+                    fallbackUri: forward:/fallback/order
+
+                - name: Retry
+                  args:
+                    retries: 2
+                    statuses: BAD_GATEWAY,GATEWAY_TIMEOUT,SERVICE_UNAVAILABLE
+                    methods: GET,POST,PUT,DELETE
+
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@userKeyResolver}"
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
+                    redis-rate-limiter.requestedTokens: 1
+
+            # =========================
+            # PAYMENT SERVICE
+            # =========================
+            - id: payment-service
+              uri: http://payment-service:8087
+              predicates:
+                - Path=/api/payments/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: paymentCircuitBreaker
+                    fallbackUri: forward:/fallback/payment
+
+                - name: Retry
+                  args:
+                    retries: 2
+                    statuses: BAD_GATEWAY,GATEWAY_TIMEOUT,SERVICE_UNAVAILABLE
+                    methods: GET,POST,PUT,DELETE
+
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@userKeyResolver}"
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
+                    redis-rate-limiter.requestedTokens: 1
+
+            # =========================
+            # NOTIFICATION SERVICE
+            # =========================
+            - id: notification-service
+              uri: http://notification-service:8088
+              predicates:
+                - Path=/api/notifications/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: notificationCircuitBreaker
+                    fallbackUri: forward:/fallback/notification
+
+                - name: Retry
+                  args:
+                    retries: 2
+                    statuses: BAD_GATEWAY,GATEWAY_TIMEOUT,SERVICE_UNAVAILABLE
+                    methods: GET,POST,PUT,DELETE
+
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@userKeyResolver}"
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
+                    redis-rate-limiter.requestedTokens: 1
+
+  # =========================
+  # CODEC
+  # =========================
+  codec:
+    max-in-memory-size: 10MB
+
+
+# =========================
+# JWT
+# =========================
+jwt:
+  secret: my-super-secret-key-for-ecommerce-authentication-service-2026
+
+
+# =========================
+# SERVER
+# =========================
+server:
+  port: 8089
+
+
+# =========================
+# ACTUATOR / MANAGEMENT
+# =========================
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - gateway
+          - metrics
+          - prometheus
+
+  endpoint:
+    health:
+      show-details: always
+
+    gateway:
+      access: read-only
+
+
+# =========================
+# RESILIENCE4J
+# =========================
+resilience4j:
+
+  circuitbreaker:
+
+    instances:
+
+      # -------------------------
+      # PRODUCT
+      # -------------------------
+      productCircuitBreaker:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        slowCallRateThreshold: 50
+        slowCallDurationThreshold: 3s
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+
+      # -------------------------
+      # VENDOR
+      # -------------------------
+      vendorCircuitBreaker:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+      # -------------------------
+      # INVENTORY
+      # -------------------------
+      inventoryCircuitBreaker:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+      # -------------------------
+      # CART
+      # -------------------------
+      cartCircuitBreaker:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+      # -------------------------
+      # ORDER
+      # -------------------------
+      orderCircuitBreaker:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+      # -------------------------
+      # PAYMENT
+      # -------------------------
+      paymentCircuitBreaker:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+      # -------------------------
+      # NOTIFICATION
+      # -------------------------
+      notificationCircuitBreaker:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+
+# =========================
+# LOGGING
+# =========================
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: INFO
+    io.github.resilience4j: INFO
+    com.ecommerce.gateway: DEBUG
